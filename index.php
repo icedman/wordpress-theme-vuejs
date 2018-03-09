@@ -8,6 +8,12 @@
 </head>
 <body>
   <div id="app"></div>
-  <script src="<?php echo get_template_directory_uri();?>/dist/build.js"></script>
+  <script>
+  var AppOptions = {
+    'firebase':
+<?php echo stripcslashes(get_option('FirebaseAuthentication_Plugin_Firebase_Config','{}')); ?>
+  };
+  </script>
+  <script src="<?php echo get_template_directory_uri();?>/dist/app.js"></script>
 </body>
 </html>
