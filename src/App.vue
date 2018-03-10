@@ -12,7 +12,10 @@
 import { Navbar, Sidebar, MainContent } from '@/layout'
 
 export default {
-  components: { Navbar, Sidebar, MainContent }
+  components: { Navbar, Sidebar, MainContent },
+  mounted () {
+    window.App = this
+  }
 }
 </script>
 

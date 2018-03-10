@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import { Dashboard, Register, Login } from '@/pages'
+import { Dashboard, Register, Login, Profile } from '@/pages'
 
 Vue.use(Router)
 
@@ -25,6 +25,14 @@ export default new Router({
       path: '/',
       name: 'Dashboard',
       component: Dashboard,
+      meta: {
+        requiresAuth: true
+      }
+    },
+    {
+      path: '/profile',
+      name: 'Profile',
+      component: Profile,
       meta: {
         requiresAuth: true
       }

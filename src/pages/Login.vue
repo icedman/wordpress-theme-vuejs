@@ -42,13 +42,6 @@
             Login with Google</button>
         </p>
       <!-- </form> -->
-
-      <section>
-        <b-message class="is-danger" title="" :active.sync="isActive">
-            {{loginMessage}}
-        </b-message>
-      </section>
-
       </div>
       <p class="has-text-centered">
         <router-link class="is-inverted" to="/register" :exact="true" :aria-expanded="false">
@@ -77,8 +70,6 @@ import { mapGetters, mapActions } from 'vuex'
 export default {
   data () {
     return {
-      isActive: false,
-      loginMessage: '',
       email: '',
       password: ''
     }
@@ -92,6 +83,12 @@ export default {
   mounted () {
     this.$store.commit('ui/SHOW_FULLPAGE', true)
     this.$store.commit('ui/SHOW_LEVELBAR', false)
+
+    // make a request to trigger google keys fetch
+    this.$http({ method: 'GET', 'url': this.$config.api_entry + '/firebase-auth/v1/fetch_keys' })
+      .catch(err => {
+        console.log(err)
+      })
   },
 
   methods: Object.assign({
@@ -112,8 +109,9 @@ export default {
       this.$firebase.auth().setPersistence(this.$firebase.auth.Auth.Persistence.LOCAL)
         .then(() => this.$firebase.auth().signInWithEmailAndPassword(this.email, this.password))
         .then(() => {
-          this.$snackbar.open({ type: 'is-success', message: 'Login successful.' })
-          this.$router.push('/')
+          // this.$snackbar.open({ type: 'is-success', message: 'Login successful.' })
+          // this.$router.push('/')
+          this.verifyToken()
         })
         .catch((error) => {
           // Handle Errors here.
@@ -127,6 +125,38 @@ export default {
         })
     },
 
+    verifyToken () {
+      var firebase = this.$firebase
+      firebase.auth().currentUser.getIdToken(/* forceRefresh */ true).then((idToken) => {
+        var params = { 'token': idToken }
+
+        this.$http({ method: 'POST', 'url': this.$config.api_entry + '/firebase-auth/v1/verify', params })
+          .then(res => {
+            if (res.data.status === 'ok') {
+              // commit to state
+              this.$snackbar.open({ type: 'is-success', message: 'Login successful.' })
+              this.$router.push('/')
+              console.log(res.data)
+              return
+            }
+
+            this.$snackbar.open({ type: 'is-danger', message: 'Unable to verify login token.' })
+            // console.log(res)
+            // unable to verify
+            // if (res.data.status !== 'ok') {
+            // return router.push('/login')
+            // }
+          })
+          .catch(() => {
+            // unable to verify
+            // return router.push('/login')
+            this.$snackbar.open({ type: 'is-danger', message: 'Unable to verify login token.' })
+          })
+      }).catch(function (error) {
+        console.log(error)
+      })
+    },
+
     gglogin (_provider) {
       let provider = _provider
       if (!provider) {
@@ -137,8 +167,7 @@ export default {
         .then(() => this.$firebase.auth().signInWithPopup(provider))
         .then(() => {
           // var token = result.credential.accessToken
-          this.$snackbar.open({ type: 'is-success', message: 'Login successful.' })
-          this.$router.push('/')
+          this.verifyToken()
         })
         .catch((error) => {
           // Handle Errors here.

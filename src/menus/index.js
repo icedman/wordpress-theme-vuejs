@@ -39,8 +39,8 @@ export default [
     meta: { icon: 'fa-comments-o', expanded: false }
   },
   {
-    name: 'Plugins',
-    path: '',
+    name: 'Profile',
+    path: '/profile',
     meta: { icon: 'fa-plug', expanded: false }
   },
   {
