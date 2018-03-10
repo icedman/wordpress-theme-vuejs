@@ -4,6 +4,7 @@
 // import 'font-awesome/css/font-awesome.css'
 
 import App from './App'
+import { WPApi } from '@/services'
 import router from './router'
 import store from './store'
 
@@ -19,10 +20,12 @@ var config = AppOptions
 // config.firebase = null // disabled firebase
 Vue.config.productionTip = false
 
-Vue.prototype.$config = config
 Vue.prototype._ = lodash
+Vue.prototype.$config = config
 Vue.prototype.$http = Axios
 Vue.prototype.$firebase = firebase
+Vue.prototype.$wp = WPApi
+
 Vue.use(Buefy, { defaultIconPack: 'fa' })
 
 let vueInstance
@@ -72,9 +75,11 @@ function bootstrap () {
       firebase.auth().currentUser.getIdToken().then((idToken) => {
         console.log(idToken)
         Axios.defaults.headers.common['Authorization'] = `Bearer ${idToken}`
+        WPApi.getUserProfile()
+        WPApi.getVendors()
       })
 
-      store.commit('user/SET_USER', user)
+      // store.commit('user/SET_USER', user)
 
       if (router.path === '/login') {
         router.push('/')
@@ -85,7 +90,14 @@ function bootstrap () {
     // ..only then we run Vue
     // -------------------------
     if (!vueInstance) {
-      vueInstance = runVue()
+      WPApi.$config = config
+      WPApi.$firebase = firebase
+      WPApi.$http = Axios
+      WPApi.$router = router
+      WPApi.$store = store
+      WPApi.$app = runVue()
+
+      vueInstance = WPApi.$app
     }
   })
 }

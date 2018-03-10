@@ -22,12 +22,12 @@
   <div class="field-body">
   <div class="field">
     <p class="control is-expanded">
-    <input class="input" type="text" placeholder="First Name" v-model="profile.first_name">
+    <input class="input" type="text" placeholder="First Name" v-model="this.$store.state.user.first_name">
     </p>
   </div>
   <div class="field">
     <p class="control is-expanded">
-    <input class="input" type="text" placeholder="Last Name" v-model="profile.last_name">
+    <input class="input" type="text" placeholder="Last Name" v-model="this.$store.state.user.last_name">
     </p>
   </div>
   <div class="field-label">
@@ -43,7 +43,7 @@
   <div class="field-body">
   <div class="field">
     <p class="control is-expanded">
-    <input class="input" type="email" placeholder="jsmith@example.org" v-model="profile.email" disabled>
+    <input class="input" type="email" placeholder="jsmith@example.org" v-model="this.$store.state.user.email" disabled>
     </p>
   </div>
   <div class="field-label">
@@ -60,7 +60,7 @@
 
   <b-field>
   <b-input placeholder="Phone number..."
-    v-model="profile.phone" disabled>
+    v-model="this.$store.state.user.phone" disabled>
   </b-input>
 
   <p class="control">
@@ -84,7 +84,7 @@
     <b-datepicker
       placeholder="Click to select date"
       icon="calendar"
-      v-model="profile.birthday">
+      >
     </b-datepicker>
   </b-field>
 
@@ -143,12 +143,12 @@
   <div class="field-body">
   <div class="field">
     <p class="control is-expanded">
-    <input class="input" :class="this.passwordType" type="password" placeholder="******" v-model="profile.password">
+    <input class="input" :class="this.passwordType" type="password" placeholder="******" v-model="password">
     </p>
   </div>
   <div class="field">
     <p class="control is-expanded">
-    <input class="input" :class="this.passwordType2" type="password" placeholder="******" v-model="profile.password_confirmation">
+    <input class="input" :class="this.passwordType2" type="password" placeholder="******" v-model="password_confirmation">
     </p>
   </div>
   <div class="field-label">
@@ -178,7 +178,7 @@
   <div class="field-body">
   <div class="field">
     <div class="control">
-    <button class="button is-danger" v-on:click="saveProfile">
+    <button class="button is-danger" v-on:click="saveProfile()">
       <span class="icon"><i class="fa fa-save"></i></span>&nbsp;&nbsp;Save
     </button>
     <div style="clear:both"></div>
@@ -198,15 +198,9 @@ import Menu from '../menus'
 export default {
   data () {
     return {
-      id: undefined,
-      profile: {
-        displayName: '',
-        first_name: '',
-        last_name: '',
-        email: '',
-        phone: ''
-      },
       name: 'Profile',
+      password: '',
+      password_confirmation: '',
       description: ''
     }
   },
@@ -216,59 +210,16 @@ export default {
       this.$snackbar.open({ type: 'is-danger', message: 'Not yet implemented' })
     },
 
-    fetchCustomerProfile () {
-      // gather from firebase auth
-
-      // this.$http({ method: 'GET', 'url': `/dashboard/view_merchant/${this.id}.json` })
-      // this.$http({ method: 'GET', 'url': `/merchants/${this.id}.json` })
-
-      var url = this.$config.api_entry + `/wc/v2/customers/${this.id}`
-      this.$http({ method: 'GET', 'url': url })
-        .then(response => {
-          console.log(response)
-          // this.profile = response.data.profile
-          // this.profile.birthday = new Date(this.profile.date_of_birth)
-        })
-        .catch(error => {
-          console.error(error)
-        })
-    },
-
-    fetchUserProfile () {
-      // gather from firebase auth
-      this.profile.displayName = this.profile.displayName || this.$store.state.user.displayName
-      this.profile.fist_name = this.profile.fist_name || this.$store.state.user.fist_name
-      this.profile.last_name = this.profile.last_name || this.$store.state.user.last_name
-      this.profile.email = this.profile.email || this.$store.state.user.email
-      this.profile.phone = this.profile.phone || this.$store.state.user.phone
-
-      // console.log(this.profile);
-
-      // this.$http({ method: 'GET', 'url': `/dashboard/view_merchant/${this.id}.json` })
-      // this.$http({ method: 'GET', 'url': `/merchants/${this.id}.json` })
-
-      var url = this.$config.api_entry + `/wp/v2/users/me`
-      this.$http({ method: 'GET', 'url': url })
-        .then(response => {
-          this.id = response.data.id
-          console.log(response)
-          // this.profile = response.data.profile
-          this.fetchCustomerProfile()
-        })
-        .catch(error => {
-          console.error(error)
-        })
-    },
-
     saveProfile () {
-      if (this.checkPassword().type !== '') {
-        return
-      }
+
+      // if (this.checkPassword().type !== '') {
+      //   return
+      // }
 
       // var csrf_token = document.querySelector('meta[name="csrf-token"]').content
       // var csrf_param = document.querySelector('meta[name="csrf-param"]').content
 
-      this.profile.date_of_birth = this.profile.birthday
+      // this.profile.date_of_birth = this.profile.birthday
       // var params = Object.assign({
       //   //
       // },
@@ -283,8 +234,8 @@ export default {
           if (response.data.id) {
             // var prevId = this.id
             this.id = response.data.id
-            this.profile.password = ''
-            this.profile.password_confirmation = ''
+            this.password = ''
+            this.password_confirmation = ''
             this.$snackbar.open('Profile updated.')
           }
         })
@@ -295,11 +246,11 @@ export default {
     },
 
     checkPassword () {
-      if (this.profile.password && this.profile.password.length > 0) {
-        if (this.profile.password.length < 4) {
+      if (this.password && this.password.length > 0) {
+        if (this.password.length < 4) {
           return { type: 'is-danger', type2: '', message: 'password is too short' }
         }
-        if (this.profile.password !== this.profile.password_confirmation) {
+        if (this.password !== this.password_confirmation) {
           return { type: 'is-danger', type2: 'is-danger', message: 'passwords do not match' }
         }
       }
@@ -324,10 +275,7 @@ export default {
     this.$store.commit('ui/SHOW_FULLPAGE', false)
     this.$store.commit('ui/SHOW_LEVELBAR', true)
 
-    this.id = this.$route.params.id
-
-    this.fetchUserProfile()
-    // this.profile = this.$store.state.profile.user;
+    // this.profile = this.$store.state.user
   }
 
 }

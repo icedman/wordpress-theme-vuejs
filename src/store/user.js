@@ -4,8 +4,11 @@ export default {
 
   state: {
     uid: '',
-    displayName: '',
     email: '',
+    first_name: '',
+    last_name: '',
+    displayName: '',
+    phone: '',
     photoURL: ''
   },
 
@@ -15,7 +18,7 @@ export default {
 
   mutations: {
     SET_USER (state, user) {
-      state.uid = user.uid
+      state.id = user.id
       state.email = user.email
       state.first_name = user.first_name
       state.last_name = user.last_name

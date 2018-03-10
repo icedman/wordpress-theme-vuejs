@@ -1,7 +1,10 @@
 <template>
   <div class="page">
     <h2>{{msg}}</h2>
-    Welcome, {{this.$store.state.user.displayName}}.
+    Welcome,
+    {{this.$store.state.user.first_name}}
+    {{this.$store.state.user.last_name}},
+    {{this.$store.state.user}},
   </div>
 </template>
 
