@@ -76,7 +76,7 @@ function bootstrap () {
         console.log(idToken)
         Axios.defaults.headers.common['Authorization'] = `Bearer ${idToken}`
         WPApi.getUserProfile()
-        WPApi.getVendors()
+        // WPApi.getVendors()
       })
 
       // store.commit('user/SET_USER', user)

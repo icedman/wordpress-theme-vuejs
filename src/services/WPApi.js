@@ -31,7 +31,19 @@ class WPApi {
   }
 
   getVendors () {
-    var url = this.$config.api_entry + `/wp/v2/taxonomies/wcpv_product_vendors`
+    var url = this.$config.api_entry + `/wp/v2/wcpv_product_vendors`
+
+    return this.$http({ method: 'GET', 'url': url })
+      .then(response => {
+        console.log(response.data)
+
+        return Promise.resolve(response.data)
+      })
+      .catch(console.log)
+  }
+
+  getVendorProducts (vendorId) {
+    var url = this.$config.api_entry + `/wp/v2/product?wcpv_product_vendors=${vendorId}`
 
     return this.$http({ method: 'GET', 'url': url })
       .then(response => {
